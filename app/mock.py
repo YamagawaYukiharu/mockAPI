@@ -46,9 +46,7 @@ def create_endpoint(mock_name: str, response_file_path: str) -> Callable:
     async def endpoint(request: Request):
         try:
             with open(response_file_path, 'r') as file:
-                full_path = request.url.path
-                body = request.json
-
+                
                 content = file.read()
                 response_config.read(response_config_file_path)
                 response_code = int(response_config.get(mock_name,'response_code'))
@@ -64,19 +62,19 @@ def add_mock() -> Callable:
         new_config = await request.json()
 
         #read existing config
-        mock_config.read(mocks_config_file_path)
+        mocks_config.read(mocks_config_file_path)
         response_config.read(response_config_file_path)
 
         #update mock.properties with new data
         for section, options in new_config.items():
-            if not mock_config.has_section(section):
-                mock_config.add_section(section)
+            if not mocks_config.has_section(section):
+                mocks_config.add_section(section)
             for key, value in options.items():
-                mock_config.set(section, key, value)
+                mocks_config.set(section, key, value)
 
         #write updated config to file
         with open(mocks_config_file_path, 'w') as config_file:
-            mock_config.write(config_file)
+            mocks_config.write(config_file)
 
         for section, options in new_config.items():
             if not response_config.has_section(section):
